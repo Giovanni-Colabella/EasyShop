@@ -1,0 +1,66 @@
+﻿@page
+@model Frontend.Pages.Excel.LogsModel
+@{
+    ViewData["Title"] = "Logs Importazioni";
+}
+
+<div class="max-w-6xl mx-auto px-4 py-6">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+        <i class="fas fa-file-alt text-indigo-600"></i>
+        Logs Importazioni Excel
+    </h2>
+
+    @if (!Model.Logs.Any())
+    {
+        <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-md shadow">
+            <i class="fas fa-info-circle mr-2"></i> Nessun log disponibile.
+        </div>
+    }
+    else
+    {
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+            <table class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-medium text-gray-800 uppercase">ID</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-800 uppercase">Mapping ID</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-800 uppercase">Entità</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-800 uppercase">Nome File</th>
+                        <th class="px-4 py-3 text-center font-medium text-gray-800 uppercase">Totale Righe</th>
+                        <th class="px-4 py-3 text-center font-medium text-gray-800 uppercase">Successi</th>
+                        <th class="px-4 py-3 text-center font-medium text-gray-800 uppercase">Errori</th>
+                        <th class="px-4 py-3 text-center font-medium text-gray-800 uppercase">Azioni</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach (var log in Model.Logs)
+                    {
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-2">@log.Id</td>
+                            <td class="px-4 py-2">@log.ExcelMappingHeaderId</td>
+                            <td class="px-4 py-2">
+                                @(log.EntityType == 'C' ? "Cliente"
+                                                        : log.EntityType == 'P' ? "Prodotto"
+                                                        : log.EntityType.ToString())
+                    </td>
+                    <td class="px-4 py-2">@log.FileName</td>
+                    <td class="px-4 py-2 text-center">@log.TotalRows</td>
+                    <td class="px-4 py-2 text-center">@log.SuccessRows</td>
+                    <td class="px-4 py-2 text-center">@log.ErrorRows</td>
+                    <td>
+                        <a asp-page="/Excel/Log" asp-route-id="@log.Id"
+                            class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <i class="fas fa-search"></i>
+                            Ispeziona
+                        </a>
+
+                            </td>
+
+
+                        </tr>
+                                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

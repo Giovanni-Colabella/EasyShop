@@ -1,0 +1,140 @@
+﻿@page
+@model Frontend.Pages.BanUser.IndexModel
+@{
+    Layout = "_Layout";
+}
+
+<!-- Form per il ban dell'utente -->
+<div class="max-w-2xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-lg border border-gray-200 text-center">
+    <div class="flex justify-center">
+        <i class="fas fa-user-times text-red-600 text-5xl"></i>
+    </div>
+    <h2 class="text-2xl font-semibold text-gray-800 mt-2">Blocca Utente</h2>
+
+    <form method="post" class="space-y-6 mt-4">
+        <div class="flex flex-col relative">
+            <label for="EmailCliente" class="text-lg font-medium text-gray-700">Email Utente</label>
+            <input type="text" id="EmailCliente" name="EmailCliente"
+                class="mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                autocomplete="off" required />
+
+            <!-- Tendina a discesa per visualizzare suggerimenti email -->
+            <div id="suggerimenti" class="absolute top-full left-0 w-full bg-white border border-gray-300 mt-1 hidden shadow-lg rounded-lg z-10"></div>
+        </div>
+
+        <div class="flex flex-col">
+            <label for="Motivazione" class="text-lg font-medium text-gray-700">Motivazione</label>
+            <textarea id="Motivazione" name="Motivazione"
+                class="mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        </div>
+
+        <div class="flex justify-center mt-6">
+            <button type="submit"
+                class="bg-red-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                Blocca utente
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const emailInput = document.getElementById("EmailCliente");
+    const suggestionsBox = document.getElementById("suggerimenti");
+    let currentFocus = -1;
+    let suggestions = [];
+
+    async function fetchSuggestions(query) {
+        try {
+            console.log("Fetching API with query:", query);
+            const response = await fetch(`http://localhost:5150/api/clienti/email?search=${encodeURIComponent(query)}`);
+
+            if (!response.ok) {
+                throw new Error(`Errore API: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            return data;
+        } catch (error) {
+            console.error("Errore durante la ricerca:", error);
+            return [];
+        }
+    }
+
+    function updateSuggestions(results) {
+        suggestionsBox.innerHTML = "";
+        suggestions = results;
+        currentFocus = -1;
+
+        if (results.length === 0) {
+            suggestionsBox.classList.add("hidden");
+            return;
+        }
+
+        results.forEach((cliente, index) => {
+            const item = document.createElement("div");
+            item.textContent = cliente.email;
+            item.classList.add("p-2", "cursor-pointer", "hover:bg-gray-200");
+
+            item.addEventListener("click", () => {
+                emailInput.value = cliente.email;
+                suggestionsBox.classList.add("hidden");
+            });
+
+            suggestionsBox.appendChild(item);
+        });
+
+        suggestionsBox.classList.remove("hidden");
+    }
+
+    let debounceTimeout;
+    emailInput.addEventListener("input", function () {
+        clearTimeout(debounceTimeout);
+        const query = emailInput.value.trim();
+
+        if (query.length < 1) {
+            suggestionsBox.classList.add("hidden");
+            return;
+        }
+
+        debounceTimeout = setTimeout(async () => {
+            const results = await fetchSuggestions(query);
+            updateSuggestions(results);
+        }, 300);
+    });
+
+    emailInput.addEventListener("keydown", function (e) {
+        const items = suggestionsBox.getElementsByTagName("div");
+
+        if (e.key === "ArrowDown") {
+            currentFocus++;
+            if (currentFocus >= items.length) currentFocus = 0;
+            setActive(items);
+        } else if (e.key === "ArrowUp") {
+            currentFocus--;
+            if (currentFocus < 0) currentFocus = items.length - 1;
+            setActive(items);
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (currentFocus > -1 && items[currentFocus]) {
+                items[currentFocus].click();
+            }
+        }
+    });
+
+    function setActive(items) {
+        if (!items || items.length === 0) return;
+        for (let item of items) {
+            item.classList.remove("bg-gray-200");
+        }
+        items[currentFocus].classList.add("bg-gray-200");
+    }
+
+    document.addEventListener("click", function (e) {
+        if (!emailInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.classList.add("hidden");
+        }
+    });
+});
+</script>

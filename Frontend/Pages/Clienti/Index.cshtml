@@ -1,0 +1,133 @@
+﻿@page 
+@model MyProject.Pages.Clienti.IndexModel
+
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-3xl font-semibold text-center text-blue-600 mb-6">Lista Clienti</h2>
+
+    <!-- Box di Ricerca -->
+    <div class="mb-4 flex justify-center">
+        <form method="get" asp-page="/Clienti/Index" class="relative">
+            <input value="@Model.Search" type="text" name="search" placeholder="Cerca cliente..." 
+                   class="px-4 py-2 border border-gray-300 rounded-md pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Tabella con intestazione sticky -->
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg h-[500px] overflow-y-auto">
+        <table class="min-w-full table-auto">
+            <thead class="sticky top-0 bg-gray-200 z-10">
+                <tr>
+                    <th class="px-4 py-2 border">Id</th>
+                    <th class="px-4 py-2 border">Nome</th>
+                    <th class="px-4 py-2 border">Cognome</th>
+                    <th class="px-4 py-2 border">Email</th>
+                    <th class="px-4 py-2 border">Cellulare</th>
+                    <th class="px-4 py-2 border">Via</th>
+                    <th class="px-4 py-2 border">Città</th>
+                    <th class="px-4 py-2 border">CAP</th>
+                    <th class="px-4 py-2 border">Status</th>
+                    <th class="px-4 py-2 border">Data Iscrizione</th>
+                    <th class="px-4 py-3 border bg-blue-300">Modifica</th>
+                    <th class="px-4 py-3 border bg-red-300">Elimina</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cliente in Model.Clienti)
+                {
+                    <tr class="hover:bg-gray-100">
+                        <td class="px-4 py-2 border">@cliente.Id</td>
+                        <td class="px-4 py-2 border">@cliente.Nome</td>
+                        <td class="px-4 py-2 border">@cliente.Cognome</td>
+                        <td class="px-4 py-2 border">@cliente.Email</td>
+                        <td class="px-4 py-2 border">@(!string.IsNullOrEmpty(cliente.NumeroTelefono) ? cliente.NumeroTelefono : "vuoto")</td>
+                        <td class="px-4 py-2 border">@(!string.IsNullOrEmpty(cliente.Indirizzo.Via) ? cliente.Indirizzo.Via : "vuoto")</td>
+                        <td class="px-4 py-2 border">@(!string.IsNullOrEmpty(cliente.Indirizzo.Citta) ? cliente.Indirizzo.Citta : "vuoto")</td>
+                        <td class="px-4 py-2 border">@(!string.IsNullOrEmpty(cliente.Indirizzo.CAP) ? cliente.Indirizzo.CAP : "vuoto")</td>
+                        <td class="px-4 py-2 border">@cliente.Status</td>
+                        <td class="px-4 py-2 border">@cliente.DataIscrizione.ToString("dd-MM-yy")</td>
+
+                        <td class="px-4 py-2 border text-center">
+                            <a asp-page="/Clienti/Edit" asp-route-id="@cliente.Id">
+                                <i class="fas fa-pencil-alt fa-2x text-blue-600 hover:text-blue-800"></i>
+                            </a>
+                        </td>
+
+                        <td class="px-4 py-2 border text-center">
+                            <button type="button" class="text-red-600 hover:text-red-800"
+                                onclick="document.getElementById('confirm-delete-@cliente.Id').style.display = 'block'">
+                                <i class="fas fa-trash fa-2x"></i>
+                            </button>
+
+                            <div id="confirm-delete-@cliente.Id" style="display: none;"
+                                class="mt-2 p-4 bg-gray-200 rounded-lg shadow-md">
+                                <p class="text-lg font-semibold text-red-600">Sei sicuro di voler eliminare @cliente.Nome @cliente.Cognome?</p>
+                                <div class="flex justify-center mt-2">
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@cliente.Id">
+                                        <button type="submit"
+                                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-800">Conferma</button>
+                                    </form>
+                                    <button type="button"
+                                        class="ml-2 bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                                        onclick="document.getElementById('confirm-delete-@cliente.Id').style.display = 'none'">Annulla</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Controlli di Paginazione -->
+    <div class="mt-6 flex justify-center items-center space-x-4">
+        @if (Model.CurrentPage > 1)
+        {
+            <a asp-route-pageNumber="@(Model.CurrentPage - 1)"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                Precedente
+            </a>
+        }
+
+        @for (int p = Math.Max(1, Model.CurrentPage - 4); p <= Math.Min(Model.TotalPages, Model.CurrentPage + 4); p++)
+        {
+            @if (p == Model.CurrentPage)
+            {
+                <span class="px-4 py-2 bg-blue-600 text-white rounded-md">
+                    @p
+                </span>
+            }
+            else
+            {
+                <a asp-route-pageNumber="@p"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-blue-700 transition">
+                    @p
+                </a>
+            }
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a asp-route-pageNumber="@(Model.CurrentPage + 1)"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                Successivo
+            </a>
+        }
+
+        <div class="ml-4">
+            <form method="get" asp-page="/Clienti/Index">
+                <label for="pageInput" class="mr-2 text-gray-700">Vai alla pagina:</label>
+                <input id="pageInput" type="number" name="pageNumber" min="1" max="@Model.TotalPages"
+                    value="@Model.CurrentPage" class="px-2 py-1 border border-gray-300 rounded-md text-gray-800"
+                    oninput="this.value = Math.min(this.value, @Model.TotalPages);" />
+
+                <button type="submit"
+                    class="ml-2 bg-blue-600 text-white rounded-md px-4 py-1 hover:bg-blue-700 transition">
+                    Vai
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

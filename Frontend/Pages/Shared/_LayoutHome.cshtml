@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - EasyShop</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/address.css">
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 text-black flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-900 shadow-md fixed top-0 left-0 w-full z-20">
+        <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <a href="/" class="text-3xl font-bold text-white">EasyShop</a>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="sm:hidden p-2 rounded-lg hover:bg-blue-700 transition">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            <!-- Menu Desktop -->
+            <div class="hidden sm:flex space-x-6 items-center" id="desktop-menu">
+                <a href="/" class="text-white hover:text-gray-300 transition">Home</a>
+                <a href="/Contatti" class="text-white hover:text-gray-300 transition">Contatti</a>
+                <a href="/Carrello" class="text-white hover:text-gray-300 transition"><i class="fas fa-shopping-cart"></i> Carrello</a>
+                <a asp-page="/Auth/Registrati"
+                    class="px-4 py-2 text-sm bg-white text-blue-900 rounded-lg shadow-md hover:bg-gray-200 transition"
+                    id="registerButton">Registrati</a>
+                <a href="#" id="logoutButton" class="text-white hover:text-gray-300 text-xl hidden">
+                    <i class="fas fa-sign-out-alt text-red-500"></i> Esci
+                </a>
+                <a asp-page="/Auth/Login" id="loginButton" class="text-white hover:text-gray-300 text-xl">
+                    <i class="fas fa-sign-in-alt text-green-400"></i> Accedi
+                </a>
+                <a asp-page="/Payment/Ordini" class="text-white hover:text-gray-300 text-xl">I tuoi ordini</a>
+                <a asp-page="/Auth/AccountManager" id="profile"
+                    class="text-white hover:text-gray-300 text-2xl p-2 rounded-full transition duration-300 ease-in-out">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+                <a asp-page="/Dashboard/Index" id="dashboardAdmin"
+                    class="text-red-500 hover:text-red-600 text-xl font-bold border-solid hidden">Admin</a>
+            </div>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="sm:hidden hidden flex-col space-y-2 px-4 pb-4">
+            <a href="/" class="block text-white hover:text-gray-300">Home</a>
+            <a href="/Contatti" class="block text-white hover:text-gray-300">Contatti</a>
+            <a href="/Carrello" class="block text-white hover:text-gray-300"><i class="fas fa-shopping-cart"></i> Carrello</a>
+            <a asp-page="/Auth/Registrati" id="registerButtonMobile"
+                class="block text-sm bg-white text-blue-900 rounded-lg px-4 py-2 shadow-md hover:bg-gray-200">Registrati</a>
+            <a href="#" id="logoutButtonMobile" class="text-white hover:text-gray-300 text-xl hidden">
+                <i class="fas fa-sign-out-alt text-red-500"></i> Esci
+            </a>
+            <a asp-page="/Auth/Login" id="loginButtonMobile" class="text-white hover:text-gray-300 text-xl">
+                <i class="fas fa-sign-in-alt text-green-400"></i> Accedi
+            </a>
+            <a asp-page="/Payment/Ordini" class="text-white hover:text-gray-300 text-xl">I tuoi ordini</a>
+            <a asp-page="/Auth/AccountManager" id="profileMobile"
+                class="text-white hover:text-gray-300 text-2xl p-2 rounded-full"><i class="fas fa-user-circle"></i></a>
+            <a asp-page="/Dashboard/Index" id="dashboardAdminMobile"
+                class="text-red-500 hover:text-red-600 text-xl font-bold border-solid hidden">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Modal Logout -->
+    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900 opacity-50"></div>
+        <div class="bg-white rounded-lg shadow-lg p-6 z-10 w-11/12 sm:w-96 text-center text-blue-900">
+            <h2 class="text-xl font-bold mb-4">
+                <i class="fas fa-sign-out-alt text-red-500"></i> Esci
+            </h2>
+            <p class="mb-6">Vuoi veramente uscire dall'account?</p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancelLogout"
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Annulla</button>
+                <button id="confirmLogout"
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Esci</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenuto principale -->
+    <main class="container mx-auto px-4 sm:px-6 py-12 flex-grow mt-24">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-blue-700 bg-blue-900 py-6 text-center text-white">
+        <p>&copy; 2025 EasyShop Inc. - Tutti i diritti riservati.</p>
+    </footer>
+
+    <!-- Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const authData = await checkAuth();
+            const isAuthenticated = authData.isAuthenticated;
+            const roles = authData.roles || [];
+
+            // Mostra/Nasconde elementi
+            const toggleAuthElements = (selector, show) => {
+                document.querySelectorAll(selector).forEach(el => {
+                    el.classList.toggle('hidden', !show);
+                });
+            };
+
+            toggleAuthElements('#logoutButton, #logoutButtonMobile', isAuthenticated);
+            toggleAuthElements('#loginButton, #loginButtonMobile', !isAuthenticated);
+            toggleAuthElements('#registerButton, #registerButtonMobile', !isAuthenticated);
+            toggleAuthElements('#profile, #profileMobile', isAuthenticated);
+
+            if (roles.includes("Admin")) {
+                toggleAuthElements('#dashboardAdmin, #dashboardAdminMobile', true);
+            }
+        });
+
+        // Menu mobile toggle
+        document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+            document.getElementById('mobile-menu')?.classList.toggle('hidden');
+        });
+
+        // Logout modal
+        document.getElementById('logoutButton')?.addEventListener('click', e => {
+            e.preventDefault();
+            document.getElementById('logoutModal')?.classList.remove('hidden');
+        });
+        document.getElementById('logoutButtonMobile')?.addEventListener('click', e => {
+            e.preventDefault();
+            document.getElementById('logoutModal')?.classList.remove('hidden');
+        });
+        document.getElementById('cancelLogout')?.addEventListener('click', () => {
+            document.getElementById('logoutModal')?.classList.add('hidden');
+        });
+
+        // Logout funzione
+        async function handleLogout() {
+            try {
+                const response = await fetch('http://localhost:5150/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Errore durante il logout');
+                }
+            } catch (error) {
+                console.error('Errore di rete:', error);
+            }
+        }
+        document.getElementById('confirmLogout')?.addEventListener('click', handleLogout);
+    </script>
+
+    <script src="~/js/autenticato.js"></script>
+
+    <script>
+        async function checkMaintenanceStatus() {
+            try {
+                const response = await fetch('http://localhost:5150/api/healthcheck/isMaintenanceModeEnabled');
+                if (response.status === 503) {
+                    window.location.href = '/SitoInManutenzione';
+                }
+            } catch (error) {
+                console.error('Errore nella verifica manutenzione:', error);
+            }
+        }
+        window.onload = checkMaintenanceStatus;
+    </script>
+</body>
+
+</html>

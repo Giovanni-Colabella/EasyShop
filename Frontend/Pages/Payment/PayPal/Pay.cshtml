@@ -1,0 +1,61 @@
+﻿@page
+@model Frontend.Pages.Payment.PayPal.PaymentModel
+
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "Paga PayPal";
+}
+
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Paga con PayPal</h2>
+
+    @if (Model.Prodotti.Any())
+    {
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Dettagli del pagamento</h3>
+            <table class="min-w-full bg-gray-50 border border-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Prodotto</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Prezzo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prodotto in Model.Prodotti)
+                    {
+                        <tr>
+                            <td class="px-4 py-2 text-sm text-gray-600">@prodotto.NomeProdotto</td>
+                            <td class="px-4 py-2 text-sm text-gray-600">@prodotto.Prezzo.ToString("C", System.Globalization.CultureInfo.CurrentCulture)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mb-4">
+            <p class="text-sm text-gray-600">Totale: <span class="font-semibold text-xl">@Model.Amount.ToString("C", System.Globalization.CultureInfo.CurrentCulture)</span></p>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-red-500">Nessun prodotto trovato per il pagamento.</p>
+    }
+
+    <form method="post">
+        <input type="hidden" asp-for="ProdottoId" />
+        <input type="hidden" asp-for="Amount" />
+        <input type="hidden" asp-for="Currency" />
+        <input type="hidden" asp-for="Prodotti" />
+
+        <p class="text-sm text-gray-500 mb-4">ProdottoId: @Model.ProdottoId</p>
+
+
+        <button type="submit"
+                class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center">
+            <i class="fab fa-paypal mr-2"></i>
+            Paga con PayPal
+        </button>
+    </form>
+
+
+</div>

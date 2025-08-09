@@ -1,0 +1,46 @@
+﻿@page
+@model Frontend.Pages.SitoInManutenzione.IndexModel
+@{
+    ViewData["Title"] = "Manutenzione";
+    Layout = null; // Rimuove il layout per un design full-page
+}
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-blue-500 to-purple-600 min-h-screen">
+    <div class="flex flex-col items-center justify-center min-h-screen text-white text-center px-4">
+        <div class="space-y-6 max-w-4xl">
+            <i class="fas fa-tools text-8xl animate-pulse"></i>
+            <h1 class="text-5xl font-bold mb-4">Sito in Manutenzione</h1>
+            <p class="text-xl mb-8">
+                Stiamo lavorando per migliorare la tua esperienza!<br>
+                Torneremo online al più presto.
+            </p>
+            
+            <div class="bg-white bg-opacity-10 p-6 rounded-lg shadow-lg">
+                <div class="flex justify-center space-x-4">
+                    <div class="text-center">
+                        <i class="fas fa-clock text-3xl mb-2"></i>
+                        <p class="font-semibold">Tempo stimato</p>
+                        <p>2-3 ore</p>
+                    </div>
+                    <div class="border-l border-white border-opacity-20"></div>
+                    <div class="text-center">
+                        <i class="fas fa-life-ring text-3xl mb-2"></i>
+                        <p class="font-semibold">Supporto</p>
+                        <p>giovannicolabell@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

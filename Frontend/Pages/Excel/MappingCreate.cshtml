@@ -1,0 +1,163 @@
+﻿@page
+@model Frontend.Pages.Excel.MappingCreateModel
+
+<h2 class="text-2xl font-semibold mb-6 flex items-center gap-3 text-gray-800">
+    <i class="fa fa-plus-circle text-blue-600"></i> Crea nuovo mapping
+</h2>
+
+<form method="post" class="space-y-6" novalidate>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Nome Mapping -->
+        <div>
+            <label asp-for="Mapping.NomeMapping" class="block text-sm text-gray-700 mb-1">
+                Nome Mapping
+            </label>
+            <input asp-for="Mapping.NomeMapping"
+                class="w-full rounded border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500" required />
+            <span asp-validation-for="Mapping.NomeMapping" class="text-red-600 text-sm mt-1"></span>
+        </div>
+
+        <!-- Tipo Entità -->
+        <div>
+            <label asp-for="Mapping.EntityType" class="block text-sm text-gray-700 mb-1">
+                Tipo Entità
+            </label>
+            <select asp-for="Mapping.EntityType" id="entityTypeSelect"
+                class="w-full rounded border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Seleziona...</option>
+                <option value="C">Cliente</option>
+                <option value="P">Articolo</option>
+            </select>
+            <span asp-validation-for="Mapping.EntityType" class="text-red-600 text-sm mt-1"></span>
+        </div>
+
+        <!-- Spacer -->
+        <div></div>
+    </div>
+
+    <section>
+        <h3 class="text-xl font-semibold mb-4 text-gray-800 border-b border-gray-300 pb-2">
+            Dettagli Mapping
+        </h3>
+
+        <div class="overflow-x-auto">
+            <table class="w-full border border-gray-300 divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-sm text-gray-700">Colonna Excel</th>
+                        <th class="px-4 py-2 text-left text-sm text-gray-700">Colonna Entità</th>
+                        <th class="px-3 py-2 w-16"></th>
+                    </tr>
+                </thead>
+                <tbody id="details-tbody" class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
+        </div>
+
+        <button type="button" id="addDetailBtn"
+            class="mt-4 inline-flex items-center gap-2 rounded border border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500">
+            <i class="fa fa-plus"></i> Aggiungi dettaglio
+        </button>
+    </section>
+
+    <div class="mt-8 flex gap-4">
+        <button type="submit"
+            class="flex items-center gap-2 rounded bg-green-600 px-5 py-2 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500">
+            <i class="fa fa-save"></i> Salva Mapping
+        </button>
+        <a asp-page="MappingList"
+            class="flex items-center gap-2 rounded border border-gray-400 px-5 py-2 text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-gray-300">
+            <i class="fa fa-times"></i> Annulla
+        </a>
+    </div>
+</form>
+
+<!-- Template riga nascosto -->
+<template id="detail-row-template">
+    <tr>
+        <td class="px-4 py-2">
+            <input name="" class="w-full rounded border-gray-300 px-2 py-1 focus:ring-2 focus:ring-blue-500" required />
+            <span class="text-red-600 text-xs mt-0.5 block"></span>
+        </td>
+        <td class="px-4 py-2">
+            <select name="" class="w-full rounded border-gray-300 px-2 py-1 focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Seleziona...</option>
+            </select>
+            <span class="text-red-600 text-xs mt-0.5 block"></span>
+        </td>
+        <td class="px-3 py-2 text-center">
+            <button type="button" aria-label="Rimuovi dettaglio" class="remove-btn text-red-600 hover:text-red-800">
+                <i class="fa fa-trash text-lg"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+<script>
+    // Mappa entità → opzioni / valore–testo
+    const opts = {
+        "C": ["Nome", "Cognome", "Email", "NumeroTelefono", "Indirizzo.Via", "Indirizzo.Citta", "Indirizzo.CAP", "DataIscrizione"],
+        "P": ["NomeProdotto", "Categoria", "Descrizione", "Giacenza", "Prezzo"]
+    };
+
+    const tbody = document.getElementById('details-tbody');
+    const template = document.getElementById('detail-row-template');
+    const entitySelect = document.getElementById('entityTypeSelect');
+    const addBtn = document.getElementById('addDetailBtn');
+
+    // Aggiunge una riga (indice calcolato in updateIndices)
+    function addDetailRow() {
+        const clone = template.content.cloneNode(true);
+        tbody.appendChild(clone);
+        updateIndices();
+        populateAllEntitySelects();
+    }
+
+    // Rimuove riga usando event delegation
+    tbody.addEventListener('click', e => {
+        if (e.target.closest('.remove-btn')) {
+            e.target.closest('tr').remove();
+            updateIndices();
+        }
+    });
+
+    // Popola ogni <select> dentro tbody in base all'entityType selezionato
+    function populateAllEntitySelects() {
+        const entity = entitySelect.value;
+        tbody.querySelectorAll('select').forEach(sel => {
+            // Ricostruisce opzioni
+            sel.innerHTML = '<option value="">Seleziona...</option>';
+            (opts[entity] || []).forEach(v => {
+                const o = document.createElement('option');
+                o.value = v;
+                o.textContent = v.replace(/([A-Z])/g, ' $1').trim();
+                sel.appendChild(o);
+            });
+        });
+    }
+
+    // Riallina attributi name e data-valmsg-for dopo aggiunte/rimozioni
+    function updateIndices() {
+        Array.from(tbody.children).forEach((tr, i) => {
+            const input = tr.querySelector('input');
+            const select = tr.querySelector('select');
+            const spans = tr.querySelectorAll('span');
+
+            input.name = `Mapping.Details[${i}].ExcelColumnName`;
+            spans[0].setAttribute('data-valmsg-for', `Mapping.Details[${i}].ExcelColumnName`);
+
+            select.name = `Mapping.Details[${i}].EntityColumnName`;
+            spans[1].setAttribute('data-valmsg-for', `Mapping.Details[${i}].EntityColumnName`);
+        });
+    }
+
+    // Quando cambia entityType, popola di conseguenza
+    entitySelect.addEventListener('change', populateAllEntitySelects);
+
+    // Al click del bottone, aggiungi riga
+    addBtn.addEventListener('click', addDetailRow);
+
+    // All'avvio pagina, aggiungo subito una riga di partenza
+    document.addEventListener('DOMContentLoaded', () => {
+        addDetailRow();
+    });
+</script>

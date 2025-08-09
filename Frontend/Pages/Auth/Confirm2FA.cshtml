@@ -1,0 +1,54 @@
+﻿@page
+@model Frontend.Pages.Auth.Confirm2FAModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "2FA";
+}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-md">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white text-center">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-shield-alt text-2xl text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold">Autenticazione a due fattori</h1>
+            <p class="opacity-90 mt-1">Inserisci il codice dall'app Authenticator</p>
+        </div>
+
+        <div class="p-6 sm:p-8">
+            <form method="post" class="space-y-6">
+                <input type="hidden" name="userid" value="@Model.Input.UserId" asp-for="Input.code" />
+                
+                <div class="space-y-2">
+                    <label for="code" class="block text-sm font-medium text-gray-700">Codice di verifica</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="text" id="code" name="code" asp-for="@Model.Input.code" 
+                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition duration-150"
+                               placeholder="123456" required autocomplete="off" autofocus>
+                    </div>
+                    <p class="text-xs text-gray-500">Apri l'app Google Authenticator per ottenere il codice</p>
+                </div>
+
+                <button type="submit" 
+                        class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Verifica e accedi
+                </button>
+            </form>
+
+            @if (Model.ErrorMessage != null)
+            {
+                <div class="mt-6 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-3"></i>
+                    <div class="text-sm text-red-700">@Model.ErrorMessage</div>
+                </div>
+            }
+
+            <div class="mt-6 text-center text-sm text-gray-500">
+                <p>Problemi con l'accesso? <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Contatta l'assistenza</a></p>
+            </div>
+        </div>
+    </div>
+</div>

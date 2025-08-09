@@ -1,0 +1,174 @@
+﻿@page
+@model Frontend.Pages.Excel.ImportExcelModel
+@{
+    ViewData["Title"] = "Importa Excel";
+}
+
+<div class="max-w-5xl mx-auto px-4 py-6">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+        <i class="fas fa-file-excel text-green-600"></i>
+        Importa da Excel
+    </h2>
+
+    <div class="flex justify-end gap-4 mb-4">
+        <a asp-page="/Excel/MappingList"
+            class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <i class="fas fa-list"></i>
+            Vai alla lista mapping
+        </a>
+        <a asp-page="/Excel/Logs"
+            class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <i class="fas fa-list"></i>
+            Vai ai Logs
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload"
+        class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Seleziona Mapping -->
+            <div>
+                <label for="mapping" class="block text-sm font-medium text-gray-700 mb-1">Seleziona Mapping</label>
+                <select asp-for="SelectedMappingId" id="mapping" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700
+                               focus:border-green-500 focus:ring-2 focus:ring-green-200">
+                    <option value="">-- Seleziona --</option>
+                    @foreach (var mapping in Model.AvailableMappings)
+                    {
+                        <option value="@mapping.Id">@mapping.NomeMapping (@mapping.EntityType)</option>
+                    }
+                </select>
+                <span asp-validation-for="SelectedMappingId" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
+
+            <!-- Campo Hidden per EntityType -->
+            <input type="hidden" asp-for="EntityType" id="entityTypeHidden" />
+
+            <!-- File Excel -->
+            <div class="md:col-span-2">
+                <label for="file" class="block text-sm font-medium text-gray-700 mb-1">File Excel</label>
+                <input asp-for="ExcelFile" id="file" type="file" accept=".xlsx,.xls" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700
+                              focus:border-green-500 focus:ring-2 focus:ring-green-200" />
+                <span asp-validation-for="ExcelFile" class="text-red-600 text-sm mt-1 block"></span>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+            <button type="submit"
+                class="inline-flex items-center gap-2 rounded-md bg-green-600 px-5 py-2 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-200">
+                <i class="fas fa-upload"></i>
+                Carica e Anteprima
+            </button>
+        </div>
+    </form>
+
+    @if (Model.ImportResult != null)
+    {
+        <section class="mb-10">
+            <h4 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-list-ol text-blue-600"></i>
+                Riepilogo Importazione
+            </h4>
+
+            <div class="bg-white rounded-lg shadow-md p-4 text-gray-800">
+                <p class="mb-2">
+                    <strong>Righe importate correttamente:</strong>
+                    @(Model.ImportResult.PreviewValidRows?.Count ?? 0)
+                </p>
+
+                <p class="mb-2">
+                    <strong>Righe non importate:</strong>
+                    @Model.ImportResult.ErrorRows
+                </p>
+
+                <p class="mb-4">
+                    <strong>Righe totali:</strong>
+                    @Model.ImportResult.TotalRows 
+                </p>
+
+                <a asp-page="/Excel/Log" asp-route-Id="@Model.ImportResult.ExcelLogId"
+                    class="inline-flex items-center gap-2 rounded-md bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                    <i class="fas fa-list"></i>
+                    Logs di importazione
+                </a>
+            </div>
+        </section>
+    }
+
+
+
+
+    <!-- Errori Trovati -->
+    @if (Model.ImportResult?.PreviewErrors.Any() == true)
+    {
+        <section class="mb-10">
+            <h4 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                Errori Trovati
+            </h4>
+            <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-2 text-left font-medium text-gray-800">Riga</th>
+                            <th class="px-3 py-2 text-left font-medium text-gray-800">Colonna Excel</th>
+                            <th class="px-3 py-2 text-left font-medium text-gray-800">Valore Grezzo</th>
+                            <th class="px-3 py-2 text-left font-medium text-gray-800">Errore</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach (var error in Model.ImportResult.PreviewErrors)
+                        {
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-2">@error.RowNumber</td>
+                                <td class="px-3 py-2">@error.ExcelColumnName</td>
+                                <td class="px-3 py-2 text-red-600 flex items-center gap-1">
+                                    <i class="fas fa-times-circle"></i>
+                                    @error.ErrorMessage
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    }
+
+    <!-- Errori di validazione del ModelState -->
+    @if (!Model.ModelState.IsValid)
+    {
+        <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg mb-6">
+            @foreach (var error in Model.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p class="flex items-start gap-2">
+                    <i class="fas fa-exclamation-circle mt-0.5"></i> @error.ErrorMessage
+                </p>
+            }
+        </div>
+    }
+
+    <!-- Messaggio di Successo -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="bg-green-50 border border-green-200 text-green-800 p-4 rounded-lg">
+            <i class="fas fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+</div>
+
+<script>
+    const mappingsData = @Html.Raw(Json.Serialize(Model.AvailableMappings));
+
+    document.getElementById("mapping").addEventListener("change", function () {
+        const selectedId = parseInt(this.value);
+        const selectedMapping = mappingsData.find(m => m.id === selectedId);
+
+        const hiddenEntityType = document.getElementById("entityTypeHidden");
+
+        if (selectedMapping && hiddenEntityType) {
+            hiddenEntityType.value = selectedMapping.entityType;
+        } else {
+            hiddenEntityType.value = "";
+        }
+    });
+</script>

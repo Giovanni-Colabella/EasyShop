@@ -1,0 +1,49 @@
+﻿@page
+@model Frontend.Pages.Payment.PayPal.PaymentSuccess
+@{
+    ViewData["Title"] = "Pagamento Riuscito";
+    Layout = "_LayoutHome";
+}
+
+<div class="min-h-screen  flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-3xl p-8 rounded-2xl shadow-xl border">
+        <div class="text-center mb-10">
+            <div class="text-green-500 mb-4">
+                <i class="fas fa-check-circle text-6xl"></i>
+            </div>
+            <h2 class="text-4xl font-bold text-gray-800 mb-2">Pagamento Completato</h2>
+            <p class="text-gray-600 text-lg">Il pagamento è stato completato con successo!</p>
+        </div>
+
+        <div class="text-center space-y-2 mb-8">
+            <p class="text-lg text-gray-700">
+                <i class="fas fa-receipt mr-2 text-blue-500"></i>
+                La transazione è stata confermata.
+            </p>
+            <p class="text-lg text-gray-700">
+                <i class="fas fa-box mr-2 text-yellow-500"></i>
+                Il tuo ordine è in elaborazione.
+            </p>
+            <p class="text-lg text-gray-700">
+                <i class="fas fa-envelope mr-2 text-indigo-500"></i>
+                Una ricevuta è stata inviata al tuo indirizzo email.
+            </p>
+        </div>
+
+        <div class="mb-10">
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">
+                <i class="fas fa-file-pdf mr-2 text-red-600"></i>Anteprima della ricevuta
+            </h3>
+            <iframe src="http://localhost:5150/api/pdf/show-order/@Model.OrdineId"
+                    width="100%" height="600px"
+                    class="border rounded-lg shadow-md"></iframe>
+        </div>
+
+        <div class="flex justify-center space-x-4">
+            <a href="/"
+               class="inline-flex items-center bg-blue-600 text-white py-2 px-6 rounded-lg text-lg hover:bg-blue-700 transition duration-200 shadow">
+                <i class="fas fa-home mr-2"></i> Torna alla Home
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+﻿@page
+@model Frontend.Pages.Auth.QrCodePageModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "2FA Auth";
+}
+
+<div class="flex items-center justify-center p-4">
+    <div class="w-full max-w-xs sm:max-w-sm md:max-w-md bg-white rounded-lg shadow-md p-6 sm:p-8 mx-auto">
+        <!-- Titolo -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-2">Configura Google Authenticator</h2>
+        <p class="text-base sm:text-lg text-center text-gray-600 mb-4 sm:mb-6">Scansiona il QR code con l'app</p>
+
+        <!-- QR Code Container -->
+        <div class="flex justify-center mb-4 sm:mb-6">
+            <div id="qrcode" class="p-3 sm:p-4 border-2 border-gray-200 rounded-lg bg-white" 
+            style="width: 180px; height: 180px;"></div>
+        </div>
+
+        <!-- Chiave manuale -->
+        <div class="text-center">
+            <p class="text-sm sm:text-base text-gray-700 mb-2">Oppure inserisci questa chiave manualmente:</p>
+            <p id="manual-key" class="text-lg sm:text-xl font-mono font-bold text-blue-600 bg-gray-100 p-2 rounded inline-block break-all"></p>
+        </div>
+
+        <!-- Conferma procedura -->
+        <form asp-page-handler="CodeApp" method="post">
+            <div class="text-center mt-2">
+                <p class="text-sm sm:text-base text-gray-700 mb-2">Inserisci il codice dell'app:</p>
+                <input type="hidden" id="UserId" asp-for="@Model.Input.UserId" />
+                <input type="text" asp-for="@Model.Input.code" value="" class="text-lg sm:text-2xl font-mono font-bold text-blue-500 bg-gray-300 rounded inline-block break-all"/>
+                @if(!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <p class="mt-2 px-2 py-4 bg-red-300 text-red-500 text-lg font-semibold">@Model.ErrorMessage</p>
+                }
+                
+                <br />
+                <button type="submit" class=" mt-3 text-lg sm:text-2xl font-mono font-bold text-white bg-blue-700 py-2 px-2 hover:bg-blue-900">
+                    Attiva</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    async function fetchQrCode() {
+        try {
+            const response = await fetch('http://localhost:5150/api/Auth/setup-2fa', {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Errore HTTP: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Risposta API:", data);
+
+            if (data.key && data.qrCode) {
+                // Mostra la chiave manuale
+                document.getElementById("manual-key").textContent = data.key;
+                
+                // Genera il QR code
+                new QRCode(document.getElementById("qrcode"), {
+                    text: data.qrCode,
+                    width: 180,
+                    height: 180,
+                    colorDark: "#1e40af", // Blu più scuro
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } else {
+                console.error("Dati mancanti nella risposta:", data);
+                alert("Configurazione 2FA non riuscita: dati mancanti");
+            }
+        } catch (error) {
+            console.error("Errore:", error);
+            alert("Errore durante la configurazione. Controlla la console per dettagli.");
+        }
+    }
+
+    // Avvia quando il DOM è pronto
+    document.addEventListener("DOMContentLoaded", fetchQrCode);
+</script>

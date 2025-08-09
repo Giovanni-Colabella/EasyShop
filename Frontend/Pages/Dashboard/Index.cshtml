@@ -1,0 +1,108 @@
+﻿@page
+@model IndexModel
+
+<header class="text-center my-12 px-4">
+    <h1 class="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-indigo-700 mb-6 animate-bounce flex justify-center items-center gap-3 flex-wrap">
+        <i class="fas fa-handshake text-indigo-500"></i>
+        <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            GestioneFacile
+        </span>
+        <span>ti dà il benvenuto <span class="text-purple-500">;)</span></span>
+    </h1>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <section class="bg-gray-300 rounded-xl shadow-lg p-6 sm:p-10 lg:p-12 mb-12 text-center">
+        <p class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
+            Benvenuto in <strong class="text-indigo-600">GestioneFacile</strong>, il cuore pulsante della tua attività! 🌟
+        </p>
+        <p class="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed max-w-3xl mx-auto">
+            Sei pronto a semplificare la gestione dei tuoi clienti, ordini e prodotti? Con la nostra dashboard intuitiva, tutto diventa più semplice e veloce! Qui potrai tenere sotto controllo ogni aspetto del tuo business con pochi clic.
+        </p>
+        <p class="text-base sm:text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto">
+            Con <strong class="text-indigo-600">GestioneFacile</strong>, risparmi tempo e gestisci tutto con una sola interfaccia elegante e funzionale. Inizia subito scegliendo una delle opzioni qui sotto e metti in moto la tua attività!
+        </p>
+    </section>
+
+    <section class="mb-16 text-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto px-4">
+            <div class="bg-gray-300 p-6 rounded-lg shadow-xl">
+                <i class="fas fa-id-badge text-indigo-700 text-4xl sm:text-5xl mb-4"></i>
+                <h2 class="text-lg sm:text-xl font-semibold text-indigo-700 mb-2">Clienti Registrati</h2>
+                <p class="text-2xl sm:text-3xl font-bold text-gray-800">@Model.Stats.AllClienti</p>
+                <p class="text-sm sm:text-base text-gray-600">Numero totale di clienti registrati nel database.</p>
+            </div>
+            <div class="bg-gray-300 p-6 rounded-lg shadow-xl">
+                <i class="fas fa-boxes text-orange-600 text-4xl sm:text-5xl mb-4"></i>
+                <h2 class="text-lg sm:text-xl font-semibold text-orange-600 mb-2">Ordini Completati</h2>
+                <p class="text-2xl sm:text-3xl font-bold text-gray-800">@Model.Stats.AllOrdini</p>
+                <p class="text-sm sm:text-base text-gray-600">Numero totale di ordini nel database</p>
+            </div>
+            <div class="bg-gray-300 p-6 rounded-lg shadow-xl">
+                <i class="fas fa-users text-teal-600 text-4xl sm:text-5xl mb-4"></i>
+                <h2 class="text-lg sm:text-xl font-semibold text-teal-600 mb-2">Registrazioni Recenti</h2>
+                <p class="text-2xl sm:text-3xl font-bold text-gray-800">@Model.Stats.WeeklyClienti</p>
+                <p class="text-sm sm:text-base text-gray-600">Nuove registrazioni nella settimana corrente</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-16">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+            @foreach (var card in new[] {
+                new { Icon="fas fa-users", Color="text-blue-500", Title="Visualizza Clienti", Desc="Gestisci e visualizza tutti i clienti registrati.", Link="/Clienti/Index", LinkText="Vai ai Clienti" },
+                new { Icon="fas fa-user-plus", Color="text-green-500", Title="Aggiungi un nuovo cliente", Desc="Aggiungi un nuovo cliente nel database.", Link="/Clienti/Create", LinkText="Crea un cliente" },
+                new { Icon="fas fa-box-open", Color="text-blue-500", Title="Visualizza Ordini", Desc="Gestisci e visualizza tutti gli ordini registrati.", Link="/Ordini/Index", LinkText="Visualizza gli ordini" },
+                new { Icon="fas fa-cart-plus", Color="text-yellow-600", Title="Crea un nuovo ordine", Desc="Aggiungi un nuovo ordine nel database.", Link="/Ordini/Create", LinkText="Crea un ordine" },
+                new { Icon="fas fa-tag", Color="text-purple-500", Title="Crea un nuovo prodotto", Desc="Aggiungi un nuovo prodotto nel database.", Link="/Prodotti/Create", LinkText="Crea un prodotto" },
+                new { Icon="fas fa-user-cog", Color="text-orange-400", Title="Rendi un utente Amministratore", Desc="Promuovi un cliente a ruolo di amministratore.", Link="/GiveRolesToUser/Index", LinkText="Rendi Admin" },
+                new { Icon="fas fa-user-slash", Color="text-red-500", Title="Blocca un Utente", Desc="Se desideri impedire a un utente di accedere al sito, puoi bloccarlo direttamente da questa sezione.", Link="/BanUser/Index", LinkText="Blocca un Utente" },
+                @* new { Icon="fas fa-tools", Color="text-amber-400", Title="Metti il Sito in Manutenzione", Desc="Se hai bisogno di eseguire lavori di manutenzione, attiva questa opzione per informare gli utenti.", Link="/Admin/Maintenance", LinkText="Metti in Manutenzione" },
+                new { Icon="fas fa-phone", Color="text-amber-700", Title="Modifica le tue informazioni di contatto", Desc="Aggiorna il tuo numero di telefono, email e altre informazioni di contatto per rimanere connesso.", Link="/Admin/UpdateContactInfo", LinkText="Modifica i tuoi contatti" }, *@
+                new {
+                    Icon = "fas fa-file-excel",
+                    Color = "text-green-600",
+                    Title = "Importa in Excel",
+                    Desc = "Importa facilmente i dati in formato Excel ( Clienti, Prodotti )",
+                    Link = "/Excel/ImportExcel",
+                    LinkText = "Importa"
+                },
+                new
+                {
+                    Icon = "fas fa-file-pdf",
+                    Color = "text-red-600",
+                    Title = "Scarica informazioni in PDF",
+                    Desc = "Scarica le informazioni dei clienti, prodotti e delle vendite in formato PDF.",
+                    Link = "/Pdf/Index",
+                    LinkText = "Scarica"
+                }
+                
+            })
+            {
+                <div class="bg-gray-300 text-gray-800 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-500 p-6 rounded-lg flex flex-col justify-between">
+                    <div class="mb-4">
+                        <i class="@card.Icon fa-2x sm:fa-3x mb-4 @card.Color"></i>
+                        <h3 class="text-lg sm:text-xl font-semibold mb-2">@card.Title</h3>
+                        <p class="text-sm sm:text-base">@card.Desc</p>
+                    </div>
+                    <a href="@card.Link" class="text-center text-white bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg shadow-md transform hover:scale-105 transition text-sm sm:text-base">@card.LinkText</a>
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="py-10 mb-12 bg-gray-100 rounded-lg shadow-md px-4">
+        <div class="text-center max-w-xl mx-auto">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Hai trovato un problema?</h2>
+            <p class="text-base sm:text-lg text-gray-600 mb-6">
+                Segnala subito il problema e faremo il possibile per risolverlo in tempo!
+            </p>
+            <a href="mailto:supporto@gestionefacile.com" class="inline-flex flex-col items-center text-indigo-600 hover:text-indigo-800">
+                <i class="fas fa-envelope fa-xl sm:fa-2x mb-2"></i>
+                <span class="text-base sm:text-lg">Segnala tramite Email</span>
+            </a>
+        </div>
+    </section>
+
+</main>

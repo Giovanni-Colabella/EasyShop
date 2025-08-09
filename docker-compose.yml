@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Password123!"
+      ACCEPT_EULA: "Y"
+    
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+      - ./backup:/var/opt/mssql/backups
+    networks:
+      - mynetwork
+
+  api:
+    build:
+      context: ./API
+    container_name: api
+    ports:
+      - "5150:8080"
+    networks:
+      - mynetwork
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=MyDb;User Id=sa;Password=Password123!;TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
+
+  frontend:
+    build:
+      context: ./Frontend
+    container_name: frontend
+    ports:
+      - "5100:80"
+    networks:
+      - mynetwork
+    depends_on:
+      - api
+    environment:
+      - API_BASE_URL=http://api:8080
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+
+volumes:
+  sqlserver-data:
+
+networks:
+  mynetwork:
+    driver: bridge

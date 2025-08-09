@@ -1,0 +1,61 @@
+﻿@page
+@model Frontend.Pages.Auth.RegisterModel
+@{
+    Layout = "_LayoutHome";
+}
+
+<h2 class="text-3xl font-bold mb-6 text-center"><i class="fa-solid fa-key fa-2x"></i>Registrazione</h2>
+
+
+<form method="post" class="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+    
+    @if (Model.ListValidationErrors != null && Model.ListValidationErrors.Count != 0)
+    {
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 rounded-lg shadow-md">
+            <div class="flex items-center mb-2">
+                <span><i class="fas fa-exclamation-triangle text-red-600"></i>
+                </span>
+                <p class="text-red-600 font-semibold text-sm"> Si è verificato un errore nell'invio dei dati</p>
+            </div>
+            <ul class="list-disc pl-5 text-red-700 text-xs space-y-1">
+                @foreach (var error in Model.ListValidationErrors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="mb-4">
+        <label for="FirstName" class="block text-sm font-medium text-gray-700">Nome</label>
+        <input type="text" id="FirstName" asp-for="Input.Nome"
+            class="mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+
+    <div class="mb-4">
+        <label for="LastName" class="block text-sm font-medium text-gray-700">Cognome</label>
+        <input type="text" id="LastName" asp-for="Input.Cognome"
+            class="mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+
+    <div class="mb-4">
+        <label for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="Email" asp-for="Input.Email"
+            class="mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+
+    <div class="mb-4">
+        <label for="Password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="Password" asp-for="Input.Password"
+            class="mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+
+    <button type="submit"
+        class="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        Registrati
+    </button>
+</form>
+
+<div class="mt-4 text-center">
+    <a asp-page="/Auth/Login" class="text-blue-500 hover:underline">Già registrato? Accedi</a>
+</div>

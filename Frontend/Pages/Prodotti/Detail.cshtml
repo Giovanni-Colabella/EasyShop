@@ -1,0 +1,82 @@
+﻿@page "{id:int}"
+@model Frontend.Pages.Prodotti.DetailModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "Dettaglio Prodotto";
+}
+
+<h1 class="text-center text-black text-5xl mb-8 font-bold">Dettaglio Prodotto</h1>
+<div class="min-h-80 bg-gradient-to-b from-white to-indigo-50 py-16 px-8 sm:px-12 lg:px-16">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Dettaglio Prodotto -->
+        <div class="lg:grid lg:grid-cols-2 lg:gap-12 space-y-10 lg:space-y-0">
+            <!-- Immagine del prodotto -->
+            <div class="relative w-full max-w-md mx-auto lg:max-w-none">
+                <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                    <img 
+                        src="@Model.GetImmagineUrl(Model.Prodotto.ImgPath)" 
+                        alt="@Model.Prodotto.NomeProdotto" 
+                        class="w-[400px] h-[400px] object-cover object-center mx-auto"
+                        onerror="this.src='/images/placeholder-product.jpg'"
+                    />
+                </div>
+            </div>
+
+            <!-- Dettagli del prodotto -->
+            <div class="space-y-6 lg:pl-10">
+                <h1 class="text-4xl font-extrabold text-gray-900">@Model.Prodotto.NomeProdotto</h1>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-3xl font-semibold text-indigo-600">@Model.Prodotto.Prezzo.ToString("C")</span>
+                    <span class="text-sm text-gray-500">/ unità</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-box-open text-gray-700"></i>
+                        <span class="text-sm font-medium text-gray-700">Disponibilità:</span>
+                        @if(Model.Prodotto.Giacenza > 0) {
+                            <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">disponibile</span>
+                        } else {
+                            <span class="px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-semibold">Esaurito</span>
+                        }
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-warehouse text-gray-700"></i>
+                        <span class="text-sm font-medium text-gray-700">Quantità disponibile:</span>
+                        <span class="text-sm text-gray-600">@Model.Prodotto.Giacenza</span>
+                    </div>
+                </div>
+
+                <div class="py-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2"><i class="fas fa-align-left mr-2"></i>Descrizione:</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        @Model.Prodotto.Descrizione
+                    </p>
+                </div>
+
+                <!-- Aggiungi al carrello e torna alla lista -->
+                <div class="flex-col space-y-6">
+                    <form method="post" asp-page-handler="PayPal" class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center">
+                        
+                        <input type="hidden" asp-for="Prodotto.Id" />
+                        <input type="hidden" asp-for="Prodotto.Prezzo"/>
+
+                        <button type="submit">
+                            <i class="fab fa-paypal mr-2"></i>
+                            Paga con PayPal
+                        </button>
+                        
+                    </form>
+
+                    <a asp-page="/Index" class="w-full sm:w-auto text-gray-800 border border-gray-300 px-6 py-3 rounded-lg flex items-center justify-center text-center hover:bg-gray-100 transition-colors duration-200">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Torna alla Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+﻿@page "{id:int}"
+@model Frontend.Pages.Ordini.EditModel
+
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-3xl font-semibold text-center text-blue-600 mb-6">Modifica Ordine</h2>
+
+    <!-- Form di Modifica dati -->
+    <form method="post" class="space-y-6">
+
+        <!-- Lista errori -->
+        @if (Model.ListValidationErrors != null && Model.ListValidationErrors.Count != 0)
+        {
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 rounded-lg shadow-md">
+                <div class="flex items-center mb-2">
+                    <span><i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </span>
+                    <p class="text-red-600 font-semibold text-sm"> Si è verificato un errore nell'invio dei dati</p>
+                </div>
+                <ul class="list-disc pl-5 text-red-700 text-xs space-y-1">
+                    @foreach (var error in Model.ListValidationErrors)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <input type="hidden" asp-for="Ordine.IdOrdine" />
+        
+        <!-- Campo Id Cliente Associato -->
+        <div class="mb-4">
+            <label for="ClienteId" class="block text-gray-700">IdCliente</label>
+            <input asp-for="Ordine.ClienteId" id="ClienteId"
+                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <!-- Campo TotaleOrdine -->
+        <div class="mb-4">
+            <label for="TotaleOrdine" class="block text-gray-700">TotaleOrdine</label>
+            <input asp-for="Ordine.TotaleOrdine" id="TotaleOrdine"
+                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <!-- Campo DataOrdine -->
+        <div class="mb-4">
+            <label for="DataOrdine" class="block text-gray-700">DataOrdine</label>
+            <input asp-for="Ordine.DataOrdine" id="DataOrdine"
+                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <!-- Campo StatoOrdine -->
+        <div class="mb-4">
+            <label class="block text-gray-700">StatoOrdine</label>
+            <select asp-for="Ordine.Stato" class="w-full p-2 border rounded-lg">
+                <option value="In elaborazione">In elaborazione</option>
+                <option value="Spedito">Spedito</option>
+                <option value="Consegnato">Consegnato</option>
+                <option value="Annullato">Annullato</option>
+            </select>
+        </div>
+
+        <!-- Campo MetodoPagamento -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Metodo di Pagamento</label>
+            <select asp-for="Ordine.MetodoPagamento" class="w-full p-2 border rounded-lg">
+                <option value="Carta di credito">Carta di credito</option>
+                <option value="PayPal">PayPal</option>
+                <option value="Bonifico bancario">Bonifico bancario</option>
+            </select>
+        </div>
+
+
+
+        <div class="flex items-center justify-center">
+            <!-- Pulsante di Salvataggio -->
+            <button type="submit" 
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Salva Modifiche
+            </button>
+
+            <!-- Link Annulla -->
+            <a asp-page="/Ordini/Index"
+                class="ml-4 text-gray-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Annulla
+            </a>
+        </div>
+    </form>
+</div>

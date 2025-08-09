@@ -1,0 +1,113 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Scarica report in PDF";
+}
+
+
+<div class="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+        <i class="fas fa-download text-blue-600 me-3"></i>Scarica Report in PDF
+    </h2>
+
+    <form id="usersForm" class="space-y-4 mb-8">
+        <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+            <i class="fas fa-users text-red-500 me-2"></i>Utenti
+        </h3>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="maxCount" class="block text-sm font-medium text-gray-600">Numero clienti (10'000 max)</label>
+                <input type="number" name="maxCount" id="maxCount" class="mt-1 w-full border rounded p-2" value="100" min="1" />
+            </div>
+            <div>
+                <label for="order" class="block text-sm font-medium text-gray-600">Ordine</label>
+                <select name="order" id="order" class="mt-1 w-full border rounded p-2">
+                    <option value="d">Discendente</option>
+                    <option value="a">Ascendente</option>
+                </select>
+                
+            </div>
+        </div>
+        <button type="submit" class="mt-4 w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition text-red-600">
+            <span class="flex items-center gap-3">
+                <i class="fas fa-file-pdf text-xl"></i>Scarica Utenti
+            </span>
+            <span class="text-sm bg-red-200 text-red-900 px-2 py-0.5 rounded">PDF</span>
+        </button>
+
+    </form>
+
+    <form id="productsForm" class="space-y-4 mb-8">
+        <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+            <i class="fas fa-box-open text-green-500 me-2"></i>Prodotti
+        </h3>
+        <button type="submit" class="w-full flex items-center justify-between p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl transition text-green-600">
+            <span class="flex items-center gap-3">
+                <i class="fas fa-file-pdf text-xl"></i>Scarica Prodotti
+            </span>
+            <span class="text-sm bg-green-200 text-green-900 px-2 py-0.5 rounded">PDF</span>
+        </button>
+    </form>
+
+    <form id="salesForm" class="space-y-4">
+        <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+            <i class="fas fa-chart-line text-blue-500 me-2"></i>Vendite
+        </h3>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="fromDate" class="block text-sm font-medium text-gray-600">Data da</label>
+                <input type="date" name="fromDate" id="fromDate" class="mt-1 w-full border rounded p-2" />
+            </div>
+            <div>
+                <label for="toDate" class="block text-sm font-medium text-gray-600">Data a</label>
+                <input type="date" name="toDate" id="toDate" class="mt-1 w-full border rounded p-2" />
+            </div>
+        </div>
+        <button type="submit" class="mt-4 w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition text-blue-600">
+            <span class="flex items-center gap-3">
+                <i class="fas fa-file-pdf text-xl"></i>Scarica Vendite
+            </span>
+            <span class="text-sm bg-blue-200 text-blue-900 px-2 py-0.5 rounded">PDF</span>
+        </button>
+    </form>
+</div>
+
+<script>
+    async function fetchAndDownload(url) {
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "include",
+        });
+        if (!response.ok) return alert("Errore durante il download");
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "report.pdf";
+        link.click();
+    }
+
+    document.getElementById("usersForm").addEventListener("submit", e => {
+        e.preventDefault();
+        const maxCount = document.getElementById("maxCount").value;
+        const order = document.getElementById("order").value;
+        const url = `http://localhost:5150/api/pdf/get-clienti?maxCount=${maxCount}&order=${order}`;
+        fetchAndDownload(url);
+    });
+
+    document.getElementById("productsForm").addEventListener("submit", e => {
+        e.preventDefault();
+        fetchAndDownload("http://localhost:5150/api/pdf/get-prodotti");
+    });
+
+    document.getElementById("salesForm").addEventListener("submit", e => {
+        e.preventDefault();
+        const from = document.getElementById("fromDate").value;
+        const to = document.getElementById("toDate").value;
+        const params = new URLSearchParams();
+        if (from) params.append("fromDate", from);
+        if (to) params.append("toDate", to);
+        const url = `http://localhost:5150/api/pdf/get-report-vendite?${params.toString()}`;
+        fetchAndDownload(url);
+    });
+</script>
+

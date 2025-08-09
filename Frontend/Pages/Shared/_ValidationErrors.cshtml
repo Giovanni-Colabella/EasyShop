@@ -1,0 +1,14 @@
+﻿@model IEnumerable<string>
+
+@if (Model != null && Model.Any())
+{
+    <div class="bg-red-100 text-red-800 p-4 rounded-md">
+        <h3 class="font-semibold">Errore di Validazione:</h3>
+        <ul class="list-disc pl-5">
+            @foreach (var error in Model)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}

@@ -1,0 +1,113 @@
+﻿@page "{id:int}"
+@model Frontend.Pages.Clienti.EditModel
+
+
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-3xl font-semibold text-center text-blue-600 mb-6">Modifica Cliente</h2>
+
+    <!-- Form di Modifica dati -->
+    <form method="post">
+
+        <input type="hidden" asp-for="Cliente.Id" />
+
+        <!-- Lista errori -->
+        @if (Model.ListValidationErrors != null && Model.ListValidationErrors.Count != 0)
+        {
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 rounded-lg shadow-md">
+                <div class="flex items-center mb-2">
+                    <span><i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </span>
+                    <p class="text-red-600 font-semibold text-sm"> Si è verificato un errore nell'invio dei dati</p>
+                </div>
+                <ul class="list-disc pl-5 text-red-700 text-xs space-y-1">
+                    @foreach (var error in Model.ListValidationErrors)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            </div>
+        }
+
+
+
+        <!-- Campo Nome -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Nome</label>
+            <input asp-for="Cliente.Nome" class="w-full p-2 border rounded-lg" />
+
+        </div>
+
+        <!-- Campo Cognome -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Cognome</label>
+            <input asp-for="Cliente.Cognome" class="w-full p-2 border rounded-lg" />
+
+        </div>
+
+        <!-- Campo Email -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Email</label>
+            <input asp-for="Cliente.Email" class="w-full p-2 border rounded-lg" />
+
+        </div>
+
+        <!-- Campo Cellulare -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Cellulare</label>
+            <input asp-for="Cliente.NumeroTelefono" class="w-full p-2 border rounded-lg"/>
+
+        </div>
+
+
+        <!-- Campo Indirizzo_Via -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Via</label>
+            <input asp-for="Cliente.Indirizzo.Via" class="w-full p-2 border rounded-lg" />
+
+        </div>
+
+        <!-- Campo Indirizzo_Citta -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Citta</label>
+            <input asp-for="Cliente.Indirizzo.Citta" class="w-full p-2 border rounded-lg" />
+
+        </div>
+
+        <!-- Campo Indirizzo_CAP -->
+        <div class="mb-4">
+            <label class="block text-gray-700">CAP</label>
+            <input asp-for="Cliente.Indirizzo.CAP" class="w-full p-2 border rounded-lg" />
+
+        </div>
+
+
+        <!-- Status -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Status</label>
+            <select asp-for="Cliente.Status" class="w-full p-2 border rounded-lg">
+                <option value="Attivo">Attivo</option>
+                <option value="Inattivo">Inattivo</option>
+            </select>
+
+        </div>
+
+        <!-- Data Iscrizione -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Data di Iscrizione</label>
+            <input asp-for="Cliente.DataIscrizione" type="date" class="w-full p-2 border rounded-lg" />
+
+        </div>
+
+
+        <div class="flex items-center justify-center">
+            <!-- Pulsante di Salvataggio -->
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800">
+                Salva Modifiche
+            </button>
+
+            <!-- Link Annulla -->
+            <a href="/Clienti" class="ml-4 text-gray-600 hover:underline">Annulla</a>
+        </div>
+
+    </form>
+</div>

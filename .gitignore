@@ -1,0 +1,8 @@
+.vs
+.vscode
+
+/API/bin/
+API/obj/
+
+Frontend/bin/
+Frontend/obj/

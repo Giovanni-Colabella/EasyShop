@@ -1,0 +1,68 @@
+﻿@page
+@model Frontend.Pages.Excel.MappingListModel
+@{
+    ViewData["Title"] = "Elenco Mapping Excel";
+}
+
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+        <i class="fas fa-table text-blue-600"></i> Elenco Mapping Excel
+    </h2>
+
+    <div class="flex justify-end mb-4 space-x-3">
+        <!-- Pulsante ritorno a ImportExcel -->
+        <a asp-page="/Excel/ImportExcel"
+           class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-lg shadow hover:bg-gray-600 transition">
+            <i class="fas fa-arrow-left mr-2"></i> Torna a Importa Excel
+        </a>
+
+        <!-- Pulsante nuovo mapping -->
+        <a asp-page="/Excel/MappingCreate"
+           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg shadow hover:bg-blue-700 transition">
+            <i class="fas fa-plus mr-2"></i> Nuovo Mapping
+        </a>
+    </div>
+
+    @if (Model.Mappings.Any())
+    {
+        <div class="overflow-x-auto bg-white shadow rounded-lg">
+            <table class="min-w-full text-sm text-left text-gray-700">
+                <thead class="bg-gray-100 text-gray-800 text-sm uppercase sticky top-0">
+                    <tr>
+                        <th class="px-6 py-3">Nome Mapping</th>
+                        <th class="px-6 py-3">Tipo Entità</th>
+                        <th class="px-6 py-3">Creato il</th>
+                        <th class="px-6 py-3">Azioni</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach (var mapping in Model.Mappings)
+                    {
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4">@mapping.NomeMapping</td>
+                            <td class="px-6 py-4">
+                                @(mapping.EntityType == "C" ? "Cliente" :
+                                  mapping.EntityType == "P" ? "Prodotto" :
+                                  mapping.EntityType)
+                            </td>
+                            <td class="px-6 py-4">@mapping.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td class="px-6 py-4 space-x-2">
+                                <a asp-page="/Excel/MappingEdit" asp-route-id="@mapping.Id"
+                                   class="inline-flex items-center px-3 py-1.5 text-sm text-white bg-yellow-500 hover:bg-yellow-600 rounded shadow transition">
+                                    <i class="fas fa-edit mr-1"></i> Modifica
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="flex items-center justify-center bg-blue-50 text-blue-800 p-4 rounded-md shadow mt-6">
+            <i class="fas fa-info-circle mr-2 text-lg"></i>
+            <span>Nessun mapping disponibile.</span>
+        </div>
+    }
+</div>

@@ -1,0 +1,446 @@
+﻿@page
+@model Frontend.Pages.Auth.AccountManagerModel
+@{
+    Layout = "_LayoutHome";
+    ViewData["Title"] = "Impostazioni Account";
+}
+
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Form Profilo -->
+        <form method="post" asp-page-handler="Profilo">
+
+            <!-- Header -->
+            <div class="pb-8 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Impostazioni Account</h1>
+                        <p class="mt-2 text-sm text-gray-500">Gestisci le impostazioni del tuo account e le preferenze
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messaggi di errore/successo -->
+            <div class="space-y-4 mt-4">
+                @if (Model.ListValidationErrors?.Count > 0)
+                {
+                    <div class="p-4 bg-red-100 border border-red-400 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                            <p class="text-red-600 font-semibold text-sm">Si è verificato un errore nell'invio dei dati</p>
+                        </div>
+                        <ul class="list-disc pl-5 text-red-700 text-xs space-y-1">
+                            @foreach (var error in Model.ListValidationErrors)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                @if (Model.SuccessProfileEdited)
+                {
+                    <div class="p-4 bg-green-100 border border-green-400 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <p class="text-green-600 font-semibold text-sm">Operazione completata con successo!</p>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Sezione Profilo -->
+            <div class="bg-white mt-8 p-4 sm:p-6 rounded-xl shadow-sm">
+                <div class="mb-6">
+                    <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Profilo</h2>
+                    <p class="text-sm text-gray-500 mt-1">Informazioni personali visibili pubblicamente</p>
+                </div>
+
+                <!-- Sezione Immagine Profilo -->
+                <div class="relative inline-block mb-4">
+                    <!-- Immagine del profilo -->
+                    <img id="profile-picture" src="https://via.placeholder.com/150" alt="Immagine profilo"
+                        class="w-32 h-32 rounded-full border-4 border-blue-500 object-cover">
+
+                    <!-- Icona di cambio immagine -->
+                    <label for="profile-image-upload"
+                        class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer shadow-md">
+                        <i class="fas fa-camera w-6 h-6"></i>
+                    </label>
+
+                    <!-- Input invisibile per caricare immagine -->
+                    <input id="profile-image-upload" type="file" class="hidden" accept="image/*">
+                </div>
+
+                <!-- Bottone per confermare il caricamento -->
+                <button id="upload-button" class="bg-blue-500 text-white px-4 py-2 rounded-md hidden">Cambia
+                    immagine</button>
+
+                <script>
+                    // Funzione asincrona per mostrare l'immagine profilo
+                    async function loadProfileImage(userId, imgElement) {
+                        try {
+                            const response = await fetch(`http://localhost:5150/api/ProfilePicture/${userId}`, {
+                                method: "GET"
+                            });
+
+                            if (!response.ok) throw new Error("Immagine non trovata");
+
+                            const result = await response.json();
+                            imgElement.src = `http://localhost:5150/${result.imgPath}`;
+                            console.log("test: " + result.imgPath);
+                        } catch (error) {
+                            console.warn("Immagine profilo non trovata");
+                        }
+                    }
+
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const input = document.getElementById("profile-image-upload");
+                        const uploadButton = document.getElementById("upload-button");
+                        const imgElement = document.getElementById("profile-picture");
+                        // Passa correttamente l'ID utente come numero
+                        const userId = "@Model.UserInputModel.UserId";
+
+                        // Carica l'immagine del profilo al caricamento della pagina
+                        loadProfileImage(userId, imgElement);
+
+                        // Mostra il pulsante e l'anteprima dopo la selezione dell'immagine
+                        input.addEventListener("change", function () {
+                            if (input.files.length > 0) {
+                                uploadButton.classList.remove("hidden");
+                                uploadButton.classList.add("block");
+
+                                const file = input.files[0];
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    imgElement.src = e.target.result;
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        });
+
+                        // Funzione per caricare l'immagine
+                        uploadButton.addEventListener("click", async function () {
+                            const file = input.files[0];
+                            if (!file) return;
+
+                            const formData = new FormData();
+                            formData.append("UserId", userId);
+                            formData.append("ImgFile", file);
+
+                            try {
+                                const response = await fetch("http://localhost:5150/api/ProfilePicture", {
+                                    method: "POST",
+                                    body: formData,
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error("Errore durante il caricamento dell'immagine");
+                                }
+
+                                const result = await response.json();
+                                alert("Immagine caricata con successo!");
+
+                                // Aggiorna l'immagine del profilo con il percorso ritornato
+                                imgElement.src = `http://localhost:5150/${result.ImgPath}`;
+
+
+                                // Nasconde il pulsante dopo il caricamento
+                                uploadButton.classList.add("hidden");
+                            } catch (error) {
+                                console.error(error);
+                                alert("Si è verificato un errore. Riprova.");
+                            }
+                        });
+                    });
+                </script>
+
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <input type="hidden" asp-for="UserInputModel.UserId" value="@Model.UserInputModel.UserId">
+
+                    <!-- Nome -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                        <div class="flex items-center bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
+                            <i class="fas fa-user text-gray-400 mr-3"></i>
+                            <input type="text" class="w-full bg-transparent focus:outline-none"
+                                asp-for="UserInputModel.Nome" value="@Model.UserInputModel.Nome">
+                        </div>
+                    </div>
+
+                    <!-- Cognome -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Cognome</label>
+                        <div class="flex items-center bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
+                            <i class="fas fa-user-tag text-gray-400 mr-3"></i>
+                            <input type="text" class="w-full bg-transparent focus:outline-none"
+                                asp-for="UserInputModel.Cognome" value="@Model.UserInputModel.Cognome">
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <div class="flex items-center bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
+                            <i class="fas fa-envelope text-gray-400 mr-3"></i>
+                            <input type="email" class="w-full bg-transparent focus:outline-none"
+                                asp-for="UserInputModel.Email" value="@Model.UserInputModel.Email">
+                        </div>
+                    </div>
+
+                    <!-- Indirizzo -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Indirizzo ( facoltativo )
+                            <p class="text-xs font-thin">L'indirizzo è necessario quando ordini un prodotto per la fase
+                                di spedizione</p>
+                        </label>
+                        <div
+                            class="relative flex items-center bg-gray-50 rounded-lg px-4 py-3 border border-gray-200 focus-within:border-blue-500">
+                            <i class="fas fa-map-marker-alt text-gray-400 mr-3"></i>
+                            <input type="text" id="addressInput"
+                                class="w-full bg-transparent focus:outline-none autocomplete-input"
+                                placeholder="Inserisci indirizzo..." autocomplete="off" spellcheck="false"
+                                value="@(string.IsNullOrEmpty(Model.IndirizzoPlaceholder) ? "" : Model.IndirizzoPlaceholder)" />
+                            <div id="suggestions" class="absolute top-full left-0 right-0 mt-1 hidden z-50"></div>
+                        </div>
+                    </div>
+
+                    <input id="hiddenStreet" type="hidden" asp-for="UserInputModel.Indirizzo_Via" />
+                    <input id="hiddenCity" type="hidden" asp-for="UserInputModel.Indirizzo_Citta" />
+                    <input id="hiddenCAP" type="hidden" asp-for="UserInputModel.Indirizzo_CAP" />
+                    <input id="hiddenHouseNumber" type="hidden" asp-for="UserInputModel.Indirizzo_HouseNumber" />
+
+                    <!-- Script indirizzo -->
+                    <script src="/js/accountManagerAddress.js"></script>
+
+                </div>
+
+                <!-- Bottone Salva -->
+                <div class="mt-6 pt-6 border-t flex justify-end">
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all font-medium">
+                        <i class="fas fa-save mr-2"></i>
+                        Salva Modifiche
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- Messaggi di errore/successo -->
+        <div class="space-y-4 mt-4">
+            @if (Model.ListPasswordValidationErrors?.Count > 0)
+            {
+                <div class="p-4 bg-red-100 border border-red-400 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                        <p class="text-red-600 font-semibold text-sm">Si è verificato un errore nell'invio dei dati</p>
+                    </div>
+                    <ul class="list-disc pl-5 text-red-700 text-xs space-y-1">
+                        @foreach (var error in Model.ListPasswordValidationErrors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (Model.SuccessPasswordEdited)
+            {
+                <div class="p-4 bg-green-100 border border-green-400 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                        <p class="text-green-600 font-semibold text-sm">Operazione completata con successo!</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Sezione Password -->
+        <form method="post" asp-page-handler="Password"
+            class="bg-white mt-8 p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-8">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-shield-alt text-indigo-600 mr-2"></i>
+                    Password
+                </h2>
+                <p class="text-sm text-gray-500 mt-2">Proteggi il tuo account con una password forte</p>
+            </div>
+
+            <input type="hidden" asp-for="Password.UserId" value="@Model.User.UserId" />
+
+            <div class="space-y-6">
+                <!-- Password Attuale -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <span>Password Attuale</span>
+                        <span class="text-xs text-red-500 ml-1">*</span>
+                    </label>
+                    <div class="relative">
+                        <div
+                            class="flex items-center bg-gray-50 rounded-lg px-4 py-3 border border-gray-200 hover:border-gray-300 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-colors">
+                            <i class="fas fa-lock text-gray-400 mr-3"></i>
+                            <input type="password"
+                                class="w-full bg-transparent focus:outline-none pr-10 text-gray-700 placeholder-gray-400"
+                                asp-for="@Model.Password.PasswordCorrente" placeholder="Inserisci la password corrente">
+                            <button type="button"
+                                class="text-gray-400 hover:text-indigo-500 ml-auto toggle-password focus:outline-none">
+                                <i class="far fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <span class="mt-1 text-xs text-gray-500">Devi confermare la tua password corrente per apportare
+                            modifiche</span>
+                    </div>
+                </div>
+
+                <!-- Nuova Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <span>Nuova Password</span>
+                        <span class="text-xs text-red-500 ml-1">*</span>
+                    </label>
+                    <div
+                        class="flex items-center bg-gray-50 rounded-lg px-4 py-3 border border-gray-200 hover:border-gray-300 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-colors">
+                        <i class="fas fa-key text-gray-400 mr-3"></i>
+                        <input type="password"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
+                            asp-for="@Model.Password.NuovaPassword" placeholder="Crea una nuova password">
+                    </div>
+                    <span class="mt-1 text-xs text-gray-500">Minimo 8 caratteri, con lettere maiuscole, minuscole e
+                        numeri</span>
+                </div>
+
+                <!-- Conferma Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <span>Conferma Password</span>
+                        <span class="text-xs text-red-500 ml-1">*</span>
+                    </label>
+                    <div
+                        class="flex items-center bg-gray-50 rounded-lg px-4 py-3 border border-gray-200 hover:border-gray-300 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-colors">
+                        <i class="fas fa-check-circle text-gray-400 mr-3"></i>
+                        <input type="password"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
+                            asp-for="@Model.Password.ConfermaPassword" placeholder="Ripeti la nuova password">
+                    </div>
+                </div>
+
+                <!-- Recupero password dimenticata -->
+                <div class="pt-2">
+                    <a asp-page="/Auth/RecuperoPassword"
+                        class="text-sm font-medium text-indigo-600 hover:text-indigo-700 inline-flex items-center">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Hai dimenticato la password?
+                    </a>
+                </div>
+
+                <!-- Bottone di invio -->
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i>
+                        Salva Modifiche
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <form method="post" class="bg-white mt-8 p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100">
+            <div class="mb-8">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-fingerprint text-indigo-600 mr-3"></i>
+                    Autenticazione a due fattori
+                </h2>
+
+                <!-- Stato con icona dinamica -->
+                <div class="mt-4 flex items-center">
+                    <p class="text-gray-600">
+                        Stato:
+                        @if (Model.Is2FAEnabled)
+                        {
+                            <span class="ml-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                                <i class="fas fa-check-circle mr-2"></i>Attivo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="ml-2 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+                                <i class="fas fa-times-circle mr-2"></i>Disattivo
+                            </span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pulsante Attiva/Disattiva condizionale -->
+            <div class="space-y-4">
+                @if (Model.Is2FAEnabled)
+                {
+                    <button type="submit" asp-page-handler="Disable2FA"
+                        class="w-full flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                        <i class="fas fa-lock-open mr-3"></i>
+                        Disattiva 2FA
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" asp-page-handler="Enable2FA"
+                        class="w-full flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <i class="fas fa-shield-alt mr-3"></i>
+                        Attiva 2FA
+                    </button>
+                }
+            </div>
+        </form>
+
+
+
+        <script>
+            // Script per toggle della visibilità password
+            document.querySelectorAll('.toggle-password').forEach(button => {
+                button.addEventListener('click', function () {
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+
+                    if (input.type === "password") {
+                        input.type = "text";
+                        icon.classList.replace('fa-eye-slash', 'fa-eye');
+                    } else {
+                        input.type = "password";
+                        icon.classList.replace('fa-eye', 'fa-eye-slash');
+                    }
+                });
+            });
+        </script>
+
+        <!-- Zona Pericolosa -->
+        <div class="bg-red-50 mt-8 p-4 sm:p-6 rounded-xl border border-red-200">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                <div class="flex-1 min-w-[200px]">
+                    <h2 class="text-lg sm:text-xl font-semibold text-red-800">Area a Rischio</h2>
+                    <p class="text-sm text-red-600 mt-1">Azioni permanenti che non possono essere annullate</p>
+                </div>
+                <i class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+            </div>
+
+            <div
+                class="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-lg border border-red-200">
+                <div class="flex-1">
+                    <h3 class="font-medium text-red-800">Eliminazione Account</h3>
+                    <p class="text-sm text-red-600">Tutti i tuoi dati verranno rimossi permanentemente</p>
+                </div>
+                <button onclick="location.href='/Auth/EliminaAccount';"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium whitespace-nowrap">
+                    <i class="fas fa-trash mr-2"></i>
+                    Elimina Account
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
